@@ -2,7 +2,7 @@ import express from 'express'
 import {Filter} from 'mongodb'
 import cors from 'cors'
 import {mongoClient, MONGODB_COLLECTION} from './util'
-import {User} from './util'
+import {Movie} from './util'
 
 const app = express()
 
@@ -10,20 +10,20 @@ app.use(cors({credentials: true, origin: 'http://localhost:4000'}))
 
 app.get('/search', async (req, res) => {
   const searchQuery = req.query.query as string
-  const country = req.query.country as string
+  const plot = req.query.plot as string
 
   if (!searchQuery || searchQuery.length < 2) {
     res.json([])
     return
   }
 
-  const db = mongoClient.db('tutorial')
-  const collection = db.collection<User>(MONGODB_COLLECTION)
+  const db = mongoClient.db('sample_mflix')
+  const collection = db.collection<Movie>(MONGODB_COLLECTION)
 
-  const filter: Filter<User> = {
+  const filter: Filter<Movie> = {
     $text: {$search: searchQuery, $caseSensitive: false, $diacriticSensitive: false},
   }
-  if (country) filter.country = country
+  if (plot) filter.plot = plot
 
   const result = await collection
     .find(filter)
@@ -40,13 +40,13 @@ async function main() {
   try {
     await mongoClient.connect()
 
-    const db = mongoClient.db('tutorial')
-    const collection = db.collection<User>(MONGODB_COLLECTION)
+    const db = mongoClient.db('sample_mflix')
+    const collection = db.collection<Movie>(MONGODB_COLLECTION)
 
     // Text index for searching fullName and email
-    await collection.createIndexes([{name: 'fullName_email_text', key: {fullName: 'text', email: 'text'}}])
+    await collection.createIndexes([{name: 'title_plot_text', key: {title: 'text', plot: 'text'}}])
 
-    app.listen(3000, () => console.log('http://localhost:3000/search?query=gilbert'))
+    app.listen(3000, () => console.log('http://localhost:3000/search?query=dark'))
   } catch (err) {
     console.log(err)
   }

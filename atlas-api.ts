@@ -1,7 +1,7 @@
 import express from 'express'
 import {request} from 'urllib'
 import cors from 'cors'
-import {mongoClient, MONGODB_COLLECTION, MONGODB_DATABASE, User} from './util'
+import {mongoClient, MONGODB_COLLECTION, MONGODB_DATABASE, Movie} from './util'
 
 const ATLAS_API_BASE_URL = 'https://cloud.mongodb.com/api/atlas/v1.0'
 const ATLAS_PROJECT_ID = process.env.MONGODB_ATLAS_PROJECT_ID
@@ -22,19 +22,19 @@ app.use(cors({credentials: true, origin: 'http://localhost:4000'}))
 
 app.get('/search', async (req, res) => {
   const searchQuery = req.query.query as string
-  const country = req.query.country as string
+  const plot = req.query.plot as string
 
   if (!searchQuery || searchQuery.length < 2) {
     res.json([])
     return
   }
 
-  const db = mongoClient.db('tutorial')
-  const collection = db.collection<User>(MONGODB_COLLECTION)
+  const db = mongoClient.db('sample_mflix')
+  const collection = db.collection<Movie>(MONGODB_COLLECTION)
 
   const pipeline = []
 
-  if (country) {
+  if (plot) {
     pipeline.push({
       $search: {
         index: USER_SEARCH_INDEX_NAME,
@@ -43,14 +43,14 @@ app.get('/search', async (req, res) => {
             {
               text: {
                 query: searchQuery,
-                path: ['fullName', 'email'],
+                path: ['title', 'plot'],
                 fuzzy: {},
               },
             },
             {
               text: {
-                query: country,
-                path: 'country',
+                query: plot,
+                path: 'plot',
               },
             },
           ],
@@ -63,7 +63,7 @@ app.get('/search', async (req, res) => {
         index: USER_SEARCH_INDEX_NAME,
         text: {
           query: searchQuery,
-          path: ['fullName', 'email'],
+          path: ['title', 'plot'],
           fuzzy: {},
         },
       },
@@ -75,11 +75,9 @@ app.get('/search', async (req, res) => {
       _id: 0,
       score: {$meta: 'searchScore'},
       userId: 1,
-      fullName: 1,
-      email: 1,
-      avatar: 1,
-      registeredAt: 1,
-      country: 1,
+      title: 1,
+      plot: 1,
+      poster: 1,
     },
   })
 
@@ -90,14 +88,14 @@ app.get('/search', async (req, res) => {
 
 app.get('/autocomplete', async (req, res) => {
   const searchQuery = req.query.query as string
-  const country = req.query.country as string
+  const plot = req.query.plot as string
 
-  const db = mongoClient.db('tutorial')
-  const collection = db.collection<User>(MONGODB_COLLECTION)
+  const db = mongoClient.db('sample_mflix')
+  const collection = db.collection<Movie>(MONGODB_COLLECTION)
 
   const pipeline = []
 
-  if (country) {
+  if (plot) {
     pipeline.push({
       $search: {
         index: USER_SEARCH_INDEX_NAME,
@@ -106,14 +104,14 @@ app.get('/autocomplete', async (req, res) => {
             {
               autocomplete: {
                 query: searchQuery,
-                path: 'fullName',
+                path: 'title',
                 fuzzy: {},
               },
             },
             {
               text: {
-                query: country,
-                path: 'country',
+                query: plot,
+                path: 'plot',
               },
             },
           ],
@@ -127,7 +125,7 @@ app.get('/autocomplete', async (req, res) => {
         // https://www.mongodb.com/docs/atlas/atlas-search/autocomplete/#options
         autocomplete: {
           query: searchQuery,
-          path: 'fullName',
+          path: 'title',
           tokenOrder: 'sequential',
         },
       },
@@ -139,11 +137,9 @@ app.get('/autocomplete', async (req, res) => {
       _id: 0,
       score: {$meta: 'searchScore'},
       userId: 1,
-      fullName: 1,
-      email: 1,
-      avatar: 1,
-      registeredAt: 1,
-      country: 1,
+      title: 1,
+      plot: 1,
+      poster: 1,
     },
   })
 
@@ -199,7 +195,7 @@ async function upsertAutocompleteIndex() {
         mappings: {
           dynamic: false,
           fields: {
-            fullName: [
+            title: [
               {
                 foldDiacritics: false,
                 maxGrams: 7,
@@ -226,7 +222,7 @@ async function main() {
     await upsertSearchIndex()
     await upsertAutocompleteIndex()
 
-    app.listen(3001, () => console.log('http://localhost:3001/search?query=gilbert'))
+    app.listen(3001, () => console.log('http://localhost:3001/search?query=dark'))
   } catch (err) {
     console.log(err)
   }

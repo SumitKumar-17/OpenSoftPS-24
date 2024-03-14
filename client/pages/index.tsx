@@ -23,6 +23,7 @@ export default function Home() {
     setAutocompleteResults([])
     setValue('search', query)
     const response = await axios.get(`http://localhost:3001/search?query=${query}`)
+    console.log(response)
     setSearchResults(response.data)
     setLoading(false)
   }
@@ -46,7 +47,7 @@ export default function Home() {
 
     if (query) {
       const response = await axios.get(`http://localhost:3001/autocomplete?query=${query}`)
-      setAutocompleteResults(response.data.map((u: any) => u.fullName))  /// change here
+      setAutocompleteResults(response.data.map((u: any) => u.title))  /// change here
     } else {
       setAutocompleteResults([])
       setSearchResults([])
@@ -136,10 +137,10 @@ export default function Home() {
               {searchResults.map((result, index) => {
                 return (
                   <div key={index} className="flex items-center space-x-4">
-                    <img src={result.avatar} alt="avatar" className="w-16 rounded-full"></img>
+                    <img src={result.poster} alt="avatar" className="w-16 rounded-full"></img>
                     <div>
-                      <p className="font-bold">{result.fullName}</p>
-                      <p className="font-mono text-sm">{result.email}</p>
+                      <p className="font-bold">{result.title}</p>
+                      <p className="font-mono text-sm">{result.plot}</p>
                     </div>
                   </div>
                 )
