@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3000;
 async function main() {
   try {
     await mongoClient.connect()
-
+    console.log("Connection Success")
     await upsertSearchIndex()
     await upsertAutocompleteIndex()
 
