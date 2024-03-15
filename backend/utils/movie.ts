@@ -10,8 +10,6 @@ const MONGODB_PASS = process.env.MONGODB_PASSWORD
 export const mongoClient = new mongodb.MongoClient(MONGODB_HOST, {
   auth: {username: MONGODB_USER, password: MONGODB_PASS},
 })
-
-
 interface Awards {
   wins: number;
   nominations: number;
