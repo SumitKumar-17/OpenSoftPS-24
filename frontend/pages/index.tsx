@@ -22,7 +22,7 @@ export default function Home() {
     setLoading(true)
     setAutocompleteResults([])
     setValue('search', query)
-    const response = await axios.get(`http://localhost:3000/search?query=${query}`)
+    const response = await axios.get(`http://localhost:3000/api/search?query=${query}`)
     console.log(response)
     setSearchResults(response.data)
     setLoading(false)
@@ -46,7 +46,7 @@ export default function Home() {
     setCurrentValue(query)
 
     if (query) {
-      const response = await axios.get(`http://localhost:3000/autocomplete?query=${query}`)
+      const response = await axios.get(`http://localhost:3000/api/autocomplete?query=${query}`)
       setAutocompleteResults(response.data.map((u: any) => u.title))  /// change here
     } else {
       setAutocompleteResults([])

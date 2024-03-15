@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "types": ["node"],
-    "target": "ES2022",
-    "strict": true,
-    "esModuleInterop": true,
-    "moduleResolution": "node"
-  }
-}
